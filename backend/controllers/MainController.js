@@ -281,7 +281,7 @@ exports.login = asyncHandler(async (req, res) => {
 
 
 		const user = await User.getByRoleLoginPassword(data.body.role, data.body.login, data.body.password)
-		if(!user) throw new InvalidDataException('Пользователь с такими данными не найден')
+		if(!user) throw new InvalidDataException('Доступ запрещен!')
 
 		res.ok({ object:'session', token:User.generateToken(user), user })
 	}catch(e){
