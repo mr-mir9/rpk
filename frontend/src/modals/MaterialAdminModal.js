@@ -26,7 +26,7 @@ function MaterialAdminModal({ callback, material }){
 
 
 	const [savedName, savedP, savedC, savedT0, savedM0, savedB, savedTr, savedN, savedAu] = useMemo(() => {
-		if(isObj(material)) return [material.name, formatNum(material.prop_p), formatNum(material.prop_c), formatNum(material.prop_t0), formatNum(material.prop_m0), formatNum(material.prop_b), formatNum(material.prop_tr), formatNum(material.prop_n), formatNum(material.prop_au)]
+		if(isObj(material)) return [material.name, material.prop_p, material.prop_c, material.prop_t0, material.prop_m0, material.prop_b, material.prop_tr, material.prop_n, material.prop_au]
 		else return ['', '', '', '', '', '', '', '', '']
 	}, [material])
 
