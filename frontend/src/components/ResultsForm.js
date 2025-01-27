@@ -1,5 +1,6 @@
-import { useRef, useEffect, useMemo, useCallback } from 'react'
+import { useRef, useEffect, useMemo, useCallback, useState } from 'react'
 import { isArr } from '../helpers/IsType'
+import AnalysisForm from '../components/AnalysisForm'
 import Chart from 'chart.js/auto'
 
 import { ReactComponent as ArrowLeftSvg } from '../icons/ArrowLeft.svg'
@@ -21,7 +22,7 @@ function ResultsForm({ resultData, setResult }){
 		const data = []
 		if(isArr(resultData.points)){
 			for(const point of resultData.points){
-				labels.push(point.l)
+				labels.push(`${point.l} м`)
 				data.push(point.t)
 			}
 		}
@@ -33,7 +34,7 @@ function ResultsForm({ resultData, setResult }){
 				labels,
 				datasets:[
 					{
-						label:'Test',
+						label:'T',
 						data
 					}
 				]
@@ -41,7 +42,17 @@ function ResultsForm({ resultData, setResult }){
 			options:{
 				responsive:true,
 				plugins:{
-					legend:{ display:false }
+					legend:{ display:false },
+					tooltip:{
+						callbacks:{
+							label: context => {
+								let label = context.dataset.label || ''
+								if(label) label += ': '
+								if(context.parsed.y !== null) label += `${format(context.parsed.y)} °C`
+								return label
+							}
+						}
+					}
 				},
 				scales:{
 					x:{
@@ -68,7 +79,7 @@ function ResultsForm({ resultData, setResult }){
 		const data = []
 		if(isArr(resultData.points)){
 			for(const point of resultData.points){
-				labels.push(point.l)
+				labels.push(`${point.l} м`)
 				data.push(point.nu)
 			}
 		}
@@ -80,7 +91,7 @@ function ResultsForm({ resultData, setResult }){
 				labels,
 				datasets:[
 					{
-						label:'Test',
+						label:'η',
 						data
 					}
 				]
@@ -88,7 +99,17 @@ function ResultsForm({ resultData, setResult }){
 			options:{
 				responsive:true,
 				plugins:{
-					legend:{ display:false }
+					legend:{ display:false },
+					tooltip:{
+						callbacks:{
+							label: context => {
+								let label = context.dataset.label || ''
+								if(label) label += ': '
+								if(context.parsed.y !== null) label += `${format(context.parsed.y)} Па*с`
+								return label
+							}
+						}
+					}
 				},
 				scales:{
 					x:{
@@ -123,6 +144,9 @@ function ResultsForm({ resultData, setResult }){
 	}, [setResult])
 
 
+	const [showAnalysis, setShowAnalysis] = useState(false)
+
+
 	return (
 		<div className='input-page'>
 			<div className='input-page__logo m18 lh140 color-blue'><div className='center' style={{ width:'100%' }}>Результаты расчета</div><div className='input-page__back color-description pointer' onClick={backHandler}><ArrowLeftSvg /><div>Назад</div></div></div>
@@ -131,7 +155,7 @@ function ResultsForm({ resultData, setResult }){
 					<div className='m16 center'>Таблица данных</div>
 					<div className='calc-table t16'>
 						<div className='calc-table__head color-blue'>
-							<div>Длина канала, м</div>
+							<div>Координата по длине канала, м</div>
 							<div>Температура, °C</div>
 							<div>Вязкость, Па*с</div>
 						</div>
@@ -144,7 +168,7 @@ function ResultsForm({ resultData, setResult }){
 					</div>
 					<div className='res-container t16'>
 						<div>Затраченное время: {parseInt(resultData.time)} мкс</div>
-						<div>Затраченная память: {format(resultData.memory)} Мб</div>
+						<div>Затраченная память: {format(resultData.memory)} МБ</div>
 						<div>Количество операций: {parseInt(resultData.operations)}</div>
 					</div>
 				</div>
@@ -155,9 +179,10 @@ function ResultsForm({ resultData, setResult }){
 					<form method='post' target='_blank' className='res-save' action={`${process.env.REACT_APP_API}/v1/save`}>
 						<input type='hidden' value={JSON.stringify(resultData)} name='data' />
 						<button type='submit' className='btn blue'>Сохранить отчет</button>
+						{showAnalysis ? <div className='t14 color-red btn-show-analysis center pointer' onClick={() => setShowAnalysis(false)}>Скрыть вычислительный эксперимент</div> : <div className='t14 color-blue btn-show-analysis center pointer'  onClick={() => setShowAnalysis(true)}>Показать вычислительный эксперимент</div>}
 					</form>
 				</div>
-				<div className='input-page__container'></div>
+				{showAnalysis ? <AnalysisForm resultData={resultData} /> : null}
 			</div>
 		</div>
 	)

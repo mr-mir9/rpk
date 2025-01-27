@@ -114,63 +114,74 @@ function CalculateForm({ materials, setResult }){
 
 	return (
 		<form className='input-page__content' onSubmit={submitHandler}>
-			<div className='input-page__container'>
-				<Select label='Материал' onChange={setMaterial}>{materialsOptions}</Select>
-			</div>
-			<div className='input-page__container'>
-				<div className='input-page__field'><Field label='Шаг дискретизации по длине' value={z} setValue={setZ} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>м</div></div>
-			</div>
-			<div className='input-page__container'>
-				<div className='input-page__group'>
-					<div className='m16 color-blue'>Геометрические параметры</div>
-					<div className='input-page__group-content'>
-						<div className='input-page__field'><Field label='Длина' value={l} setValue={setL} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>м</div></div>
-						<div className='input-page__field'><Field label='Ширина' value={w} setValue={setW} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
-						<div className='input-page__field'><Field label='Высота' value={h} setValue={setH} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
-					</div>
-				</div>
-			</div>
-			<div className='input-page__container'>
-				<div className='input-page__group'>
-					<div className='m16 color-blue'>Параметры свойств объекта</div>
-					<div className='input-page__group-content'>
-						<div className='input-page__field'><Field label='Плотность' value={p} disabled={true} /><div className='t16'>кг/м<sup>3</sup></div></div>
-						<div className='input-page__field'><Field label='Удельная теплоемкость' value={c} disabled={true} /><div className='t16'>Дж/(кг⋅°C)</div></div>
-						<div className='input-page__field'><Field label='Температура плавления' value={t0} disabled={true} /><div className='t16'>°C</div></div>
-						<div className='input-page__warning t12 lh140'><AlertTriangleSvg /><div>Установлены параметры для выбранного материала. Если требуется произвести расчет с другими данными, попросите у администратора изменить существующий или добавить новый материал</div></div>
-					</div>
-				</div>
-			</div>
-			<div className='input-page__container'>
-				<div className='input-page__group'>
-					<div className='m16 color-blue'>Режимные параметры процесса</div>
-					<div className='input-page__group-content'>
-						<div className='input-page__field'><Field label='Скорость крышки' value={vu} setValue={setVu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м/с</div></div>
-						<div className='input-page__field'><Field label='Температура крышки' value={tu} setValue={setTu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>°C</div></div>
-					</div>
-				</div>
-			</div>
-			<div className='input-page__container'>
-				<div className='input-page__group'>
-					<div className='m16 color-blue'>Эмпирические коэффициенты математической модели</div>
-					<div className='input-page__group-content'>
-						<div className='input-page__field'><Field label='Коэффициент консистенции' value={m0} disabled={true} /><div className='t16'>Па⋅с^n</div></div>
-						<div className='input-page__field'><Field label='Температурный коэффициент вязкости материала' value={b} disabled={true} /><div className='t16'>1/°C</div></div>
-						<div className='input-page__field'><Field label='Температура приведения' value={tr} disabled={true} /><div className='t16'>°C</div></div>
-						<div className='input-page__field'><Field label='Индекс течения материала' value={n} disabled={true} /><div className='t16'>–</div></div>
-						<div className='input-page__field'><Field label='Коэффициент теплоотдачи' value={au} disabled={true} /><div className='t16'>Вт/(м<sup>2</sup>⋅°C)</div></div>
-						<div className='input-page__warning t12 lh140'><AlertTriangleSvg /><div>Установлены параметры для выбранного материала. Если требуется произвести расчет с другими данными, попросите у администратора изменить существующий или добавить новый материал</div></div>
-					</div>
-				</div>
-			</div>
-			<div className='input-page__container'>
-				{isStr(error) && error.length ? (
+			{isStr(error) && error.length ? (
+				<div className='input-page__container-error'>
 					<div className='form-error t14 lh120'>
 						<AlertTriangleSvg />
 						<div>{error}</div>
 					</div>
-				) : null}
-				<button className='btn blue' type='submit' disabled={disabled}>{loading ? 'Происходит расчет' : <><div>Произвести рассчет</div><LongArrowRightSvg className='btn-ico__right' /></>}</button>
+				</div>
+			) : null}
+			<div className='input-page__containers'>
+				<div className='input-page__container'>
+					<Select label='Материал' onChange={setMaterial}>{materialsOptions}</Select>
+				</div>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Параметры свойств объекта</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Плотность' value={p} disabled={true} /><div className='t16'>кг/м<sup>3</sup></div></div>
+							<div className='input-page__field'><Field label='Удельная теплоемкость' value={c} disabled={true} /><div className='t16'>Дж/(кг⋅°C)</div></div>
+							<div className='input-page__field'><Field label='Температура плавления' value={t0} disabled={true} /><div className='t16'>°C</div></div>
+							<div className='input-page__warning t12 lh140'><AlertTriangleSvg /><div>Установлены параметры для выбранного материала. Если требуется произвести расчет с другими данными, попросите у администратора изменить существующий или добавить новый материал</div></div>
+						</div>
+					</div>
+				</div>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Эмпирические коэффициенты математической модели</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Коэффициент консистенции' value={m0} disabled={true} /><div className='t16'>Па⋅с^n</div></div>
+							<div className='input-page__field'><Field label='Температурный коэффициент вязкости материала' value={b} disabled={true} /><div className='t16'>1/°C</div></div>
+							<div className='input-page__field'><Field label='Температура приведения' value={tr} disabled={true} /><div className='t16'>°C</div></div>
+							<div className='input-page__field'><Field label='Индекс течения материала' value={n} disabled={true} /><div className='t16'>–</div></div>
+							<div className='input-page__field'><Field label='Коэффициент теплоотдачи' value={au} disabled={true} /><div className='t16'>Вт/(м<sup>2</sup>⋅°C)</div></div>
+							<div className='input-page__warning t12 lh140'><AlertTriangleSvg /><div>Установлены параметры для выбранного материала. Если требуется произвести расчет с другими данными, попросите у администратора изменить существующий или добавить новый материал</div></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className='input-page__containers'>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Геометрические параметры канала</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Длина' value={l} setValue={setL} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>м</div></div>
+							<div className='input-page__field'><Field label='Ширина' value={w} setValue={setW} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
+							<div className='input-page__field'><Field label='Высота' value={h} setValue={setH} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
+						</div>
+					</div>
+				</div>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Режимные параметры процесса</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Скорость крышки' value={vu} setValue={setVu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м/с</div></div>
+							<div className='input-page__field'><Field label='Температура крышки' value={tu} setValue={setTu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>°C</div></div>
+						</div>
+					</div>
+				</div>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Параметры метода решения</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Скорость крышки' value={z} setValue={setZ} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
+						</div>
+					</div>
+				</div>
+				<div className='input-page__container'>
+					<button className='btn blue' type='submit' disabled={disabled}>{loading ? 'Происходит расчет' : <><div>Произвести рассчет</div><LongArrowRightSvg className='btn-ico__right' /></>}</button>
+				</div>
 			</div>
 		</form>
 	)

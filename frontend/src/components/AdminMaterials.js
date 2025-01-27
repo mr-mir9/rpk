@@ -64,7 +64,7 @@ function AdminMaterials({ data, setData }){
 						<div className='admin-page__material-group'>
 							<div className='m16'>Параметры свойств объекта</div>
 							<div className='admin-page__material-line t16'>
-								<div>Плотность [кг/м3]</div>
+								<div>Плотность [кг/м<sup>3</sup>]</div>
 								<div />
 								<div className='m16'>{formatNum(material.prop_p)}</div>
 							</div>
@@ -82,7 +82,7 @@ function AdminMaterials({ data, setData }){
 						<div className='admin-page__material-group'>
 							<div className='m16'>Эмпирические коэффициенты математической модели</div>
 							<div className='admin-page__material-line t16'>
-								<div>Коэффициент консистенции [Па⋅с^n]</div>
+								<div>Коэффициент консистенции [Па⋅с<sup>n</sup>]</div>
 								<div />
 								<div className='m16'>{formatNum(material.prop_m0)}</div>
 							</div>
@@ -102,7 +102,7 @@ function AdminMaterials({ data, setData }){
 								<div className='m16'>{formatNum(material.prop_n)}</div>
 							</div>
 							<div className='admin-page__material-line t16'>
-								<div>Коэффициент теплоотдачи [Вт/(м2⋅°C)]</div>
+								<div>Коэффициент теплоотдачи [Вт/(м<sup>2</sup>⋅°C)]</div>
 								<div />
 								<div className='m16'>{formatNum(material.prop_au)}</div>
 							</div>

@@ -1,8 +1,11 @@
 const express = require('express')
 const cors = require('cors')
+const requestIp = require('request-ip')
+
 const app = express()
 const port = 35201
 
+app.use(requestIp.mw())
 app.use(cors())
 
 const middleware = require('./config/Middleware')

@@ -10,7 +10,7 @@ import Select, { Option } from '../helpers/Select'
 import { ReactComponent as AlertTriangleSvg } from '../icons/AlertTriangle.svg'
 
 
-function AuthForm(){
+function AuthForm({ refreshAccess }){
 
 	const { loginHandler } = useUser()
 	const api = useApi()
@@ -47,16 +47,18 @@ function AuthForm(){
 		setLoading(true)
 
 		api.login(role, login, password)
-		.then(session => {
-			loginHandler(session)
+		.then(data => {
+			if(data === 'user_banned') return refreshAccess()
 
-			const { user } = session
+			loginHandler(data)
+
+			const { user } = data
 			if(user.role === 'admin') navigate('/admin', { replace: true })
 			else navigate('/calculate', { replace: true })
 		})
 		.catch(e => parseNetworkError(e, null, setError))
 		.finally(() => setLoading(false))
-	}, [loginHandler, api, role, login, password, navigate])
+	}, [loginHandler, api, role, login, password, navigate, refreshAccess])
 
 
 	return (

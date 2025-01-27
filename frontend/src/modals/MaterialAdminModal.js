@@ -82,15 +82,15 @@ function MaterialAdminModal({ callback, material }){
 			<form className='form' onSubmit={submitHandler}>
 				<div className='form-field'><Field label='Название' value={name} setValue={setName} err={nameErr} setErr={setNameErr} setValid={setNameValid} validators={nameValidators} disabled={loading} /></div>
 				<div className='form-field__group m16 lh120'><div>Параметры свойств объекта</div></div>
-				<div className='form-field form-field__type'><Field label='Плотность' value={p} setValue={setP} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>м</div></div>
+				<div className='form-field form-field__type'><Field label='Плотность' value={p} setValue={setP} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>кг/м<sup>3</sup></div></div>
 				<div className='form-field form-field__type'><Field label='Удельная теплоемкость' value={c} setValue={setC} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>Дж/(кг⋅°C)</div></div>
 				<div className='form-field form-field__type'><Field label='Температура плавления' value={t0} setValue={setT0} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>°C</div></div>
 				<div className='form-field__group m16 lh120'><div>Эмпирические коэффициенты математической модели</div></div>
-				<div className='form-field form-field__type'><Field label='Коэффициент консистенции' value={m0} setValue={setM0} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>Па⋅с^n</div></div>
+				<div className='form-field form-field__type'><Field label='Коэффициент консистенции' value={m0} setValue={setM0} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>Па⋅с<sup>n</sup></div></div>
 				<div className='form-field form-field__type'><Field label='Температурный коэффициент вязкости материала' value={b} setValue={setB} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>1/°C</div></div>
 				<div className='form-field form-field__type'><Field label='Температура приведения' value={tr} setValue={setTr} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>°C</div></div>
 				<div className='form-field form-field__type'><Field label='Индекс течения материала' value={n} setValue={setN} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>–</div></div>
-				<div className='form-field form-field__type'><Field label='Коэффициент теплоотдачи' value={au} setValue={setAu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>Вт/(м2⋅°C)</div></div>
+				<div className='form-field form-field__type'><Field label='Коэффициент теплоотдачи' value={au} setValue={setAu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} replace={[[/\./, ',']]} /><div className='t16'>Вт/(м<sup>2</sup>⋅°C)</div></div>
 				{isStr(error) && error.length ? (
 					<div className='form-error t14 lh120'>
 						<AlertTriangleSvg />

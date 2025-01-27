@@ -96,6 +96,8 @@ function Api(bearer){
 	result.editMaterial = requestBody => Request({ method:'PUT', url:'/v1/admin/material', bearer, data:requestBody })
 	result.deleteMaterial = materialId => Request({ method:'DELETE', url:`/v1/admin/material/${materialId}`, bearer })
 	result.getMaterials = materialId => Request({ method:'GET', url:`/v1/materials`, bearer })
+	result.saveSettings = (authCountAttempts, authBanMins) => Request({ method:'PUT', url:`/v1/admin/settings`, bearer, data:{ auth_count_attempts:authCountAttempts, auth_ban_mins:authBanMins } })
+	result.access = () => Request({ method:'GET', url:`/v1/access`, bearer })
 
 	return result
 

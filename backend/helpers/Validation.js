@@ -59,13 +59,29 @@ module.exports.materialName = data => {
 }
 module.exports.materialProp = (data, prop, txtEmpty, txtInvalid, txtNegative) => {
 	try{
-		if(!isStr(data.body[prop]) || !data.body[prop].length) data.errors.push(txtEmpty)
-		else if(!Validators.num(data.body[prop])) data.errors.push(txtInvalid)
+		if(!isStr(data.body[prop]) || !data.body[prop].length) throw new Error(txtEmpty)
+		else if(!Validators.num(data.body[prop])) throw new Error(txtInvalid)
 		else{
 			data.body[prop] = parseFloat(data.body[prop].replace(/,/, '.'))
-			if(!isFinite(data.body[prop])) data.errors.push(txtEmpty)
-			else if(data.body[prop] <= 0) data.errors.push(txtNegative)
+			if(!isFinite(data.body[prop])) throw new Error(txtInvalid)
+			else if(data.body[prop] <= 0) throw new Error(txtNegative)
 		}
+	}catch(e){
+		data.errors.push(e.message)
+	}
+}
+
+
+module.exports.settingCount = (data, prop, txtEmpty, txtInvalid, txtZero) => {
+	try{
+		const body = data.body
+		if(!isStr(body[prop]) || !body[prop].length) throw new Error(txtEmpty)
+
+		body[prop] = body[prop].trim()
+		if(!/^[0-9]{0,3}$/.test(body[prop])) throw new Error(txtInvalid)
+
+		body[prop] = parseInt(body[prop])
+		if(body[prop] <= 0) throw new Error(txtZero)
 	}catch(e){
 		data.errors.push(e.message)
 	}

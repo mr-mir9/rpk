@@ -1,11 +1,19 @@
+const fs = require('fs')
 const asyncHandler = require('express-async-handler')
+const Db = require('../config/Db')
 const InvalidFieldsException = require('../exceptions/InvalidFieldsException')
 const InvalidDataException = require('../exceptions/InvalidDataException')
 const Validators = require('../helpers/Validators')
 const Validation = require('../helpers/Validation')
 const User = require('../models/UserModel')
 const Material = require('../models/MaterialModel')
+const Setting = require('../models/SettingModel')
+const AuthBan = require('../models/AuthBanModel')
+const AuthWrongAttempt = require('../models/AuthWrongAttemptModel')
 const { isObj, isStr } = require('../helpers/IsType')
+const { spawn } = require('child_process')
+
+const filesDir = `${__dirname}/../files`
 
 
 exports.calculate = asyncHandler(async (req, res) => {
@@ -150,7 +158,7 @@ exports.calculate = asyncHandler(async (req, res) => {
 			const y = vu/h
 			const qy = h*w*m0*Math.pow(y, n+1)
 			const qa = w*au*(Math.pow(b,-1)-tu+tr)
-			const nowT = tr + Math.log( (b*qy+w*au)*(1-Math.exp(-1*nowZ*b*qa/(p*c*qch)))/(b*qa) + Math.exp(b*(t0-tr-(z*qa/(p*c*qch)))) )/b
+			const nowT = tr + Math.log( (b*qy+w*au)*(1-Math.exp(-1*nowZ*b*qa/(p*c*qch)))/(b*qa) + Math.exp(b*(t0-tr-(nowZ*qa/(p*c*qch)))) )/b
 			const nu = m0*Math.exp(-1*b*(nowT-tr))*Math.pow(y,n-1)
 			if(i === toL){
 				totalT = nowT
@@ -161,8 +169,28 @@ exports.calculate = asyncHandler(async (req, res) => {
 		}
 
 
+		const analysis = []
+		const fromVu = 1
+		const toVu = 8
+		const deltaVu = 0.5
+
+		for(let i = parseInt(fromVu*10); i <= parseInt(toVu*10); i+=parseInt(deltaVu*10)){
+			const nowVu = i/10
+			const vu_qch = h*w*nowVu*f/2
+			const vu_q = p*vu_qch*3600
+
+			const vu_y = nowVu/h
+			const vu_qy = h*w*m0*Math.pow(vu_y,n+1)
+			const vu_qa = w*au*(Math.pow(b,-1) - tu + tr)
+
+			const vu_t = tr + Math.log(  (b*vu_qy+w*au)*( 1 - Math.exp(-1*b*vu_qa*l/(p*c*vu_qch)) )/(b*vu_qa) + Math.exp(b*(t0-tr-(vu_qa*l/(p*c*vu_qch)) )) )/b
+			const vu_nu = m0*Math.exp( -1*b*(vu_t-tr)) *Math.pow(vu_y,n-1)
+			analysis.push({ vu:nowVu, q:vu_q, nu:vu_nu, t:vu_t, l })
+		}
+
+
 		const end = performance.now()
-		res.ok({ q, t:totalT, nu:totalNu, operations, time:(end-start)*1000, memory:process.memoryUsage().heapUsed/1000000, points })
+		res.ok({ q, t:totalT, nu:totalNu, operations, time:(end-start)*1000, memory:process.memoryUsage().heapUsed/1000000, points, analysis })
 	}catch(e){
 		res.err(e)
 	}
@@ -223,7 +251,7 @@ exports.save = asyncHandler(async (req, res) => {
 		ws.cell(6, 6).number(parseStrNum(data.input.l)).style(numberStyle)
 		ws.cell(7, 5).string('Параметры свойств материала:').style(boldStyle)
 		ws.cell(8, 5).string('Плотность, кг/м^3').style(wrapStyle)
-		ws.cell(6, 6).number(parseStrNum(data.input.p)).style(numberStyle)
+		ws.cell(8, 6).number(parseStrNum(data.input.p)).style(numberStyle)
 		ws.cell(9, 5).string('Удельная теплоёмкость, Дж/(кг*°С)').style(wrapStyle)
 		ws.cell(9, 6).number(parseStrNum(data.input.c)).style(numberStyle)
 		ws.cell(10, 5).string('Температура плавления, °С').style(wrapStyle)
@@ -232,7 +260,7 @@ exports.save = asyncHandler(async (req, res) => {
 		ws.cell(12, 5).string('Скорость крышки, м/с').style(wrapStyle)
 		ws.cell(12, 6).number(parseStrNum(data.input.vu)).style(numberStyle)
 		ws.cell(13, 5).string('Температура крышки, °С').style(wrapStyle)
-		ws.cell(12, 6).number(parseStrNum(data.input.tu)).style(numberStyle)
+		ws.cell(13, 6).number(parseStrNum(data.input.tu)).style(numberStyle)
 		ws.cell(14, 5).string('Эмпирические коэффициенты математической модели:').style(boldStyle)
 		ws.cell(15, 5).string('Коэффициент консистенции при температуре приведения, Па*с^n').style(wrapStyle)
 		ws.cell(15, 6).number(parseStrNum(data.input.m0)).style(numberStyle)
@@ -260,7 +288,27 @@ exports.save = asyncHandler(async (req, res) => {
 
 exports.admin = asyncHandler(async (req, res) => {
 	try{
-		res.ok({ users:await User.getAll(), materials:await Material.getAll() })
+		res.ok({ users:await User.getAll(), materials:await Material.getAll(), settings:await Setting.getAll() })
+	}catch(e){
+		res.err(e)
+	}
+})
+
+exports.editSettings = asyncHandler(async (req, res) => {
+	try{
+		if(!isObj(req)) throw new Error('Invalid request object')
+		if(!isObj(req.body)) throw new Error('Invalid request body object')
+
+		const data = { body:req.body, errors:[] }
+		await Validation.settingCount(data, 'auth_count_attempts', 'Заполните поле с количеством попыток авторизации', 'Неверно указано количество попыток', 'Количество попыток должно быть больше нуля')
+		await Validation.settingCount(data, 'auth_ban_mins', 'Заполните поле с количеством минут блокировки', 'Неверно указано количество минут блокировки', 'Количество минут блокировки должно быть больше нуля')
+		if(data.errors.length) throw new InvalidDataException(data.errors.join('. '))
+
+		const { auth_count_attempts:authCountAttempts, auth_ban_mins:authBanMins } = data.body
+		await Setting.update(authCountAttempts, authBanMins)
+		await AuthBan.clearAll()
+		await AuthWrongAttempt.clearAll()
+		res.ok(await Setting.getAll())
 	}catch(e){
 		res.err(e)
 	}
@@ -280,12 +328,27 @@ exports.login = asyncHandler(async (req, res) => {
 		if(data.errors.length) throw new InvalidDataException(data.errors.join('. '))
 
 
+		const ip = req.clientIp
+		const authCountAttempts = await Setting.getAuthCountAttempts()
+
+
 		const user = await User.getByRoleLoginPassword(data.body.role, data.body.login, data.body.password)
-		if(!user) throw new InvalidDataException('Доступ запрещен!')
+		if(!user){
+			await AuthWrongAttempt.add(ip)
+			const authNowAttempts = await AuthWrongAttempt.get(ip)
+			const authHasAttempts = authCountAttempts - authNowAttempts
+			if(authHasAttempts <= 0){
+				await AuthWrongAttempt.clear(ip)
+				await AuthBan.add(ip)
+				throw new InvalidDataException('user_banned')
+			}
+			throw new InvalidDataException(`Доступ запрещен! Осталоcь попыток: ${authHasAttempts}`)
+		}
 
 		res.ok({ object:'session', token:User.generateToken(user), user })
 	}catch(e){
-		res.err(e)
+		if(e.message === 'user_banned') res.ok('user_banned')
+		else res.err(e)
 	}
 })
 
@@ -392,5 +455,54 @@ exports.getMaterials = asyncHandler(async (req, res) => {
 		res.ok(await Material.getAll())
 	}catch(e){
 		res.err(e)
+	}
+})
+
+
+exports.checkAccess = asyncHandler(async (req, res) => {
+	try{
+		const ip = req.clientIp
+		const authBan = await AuthBan.getByIp(ip)
+		const response = { ban:false }
+		if(authBan){
+			response.ban = true
+			response.ban_finish = authBan.date_finish
+		}
+		res.ok(response)
+	}catch(e){
+		res.err(e)
+	}
+})
+
+
+exports.backupDatabase = asyncHandler(async (req, res) => {
+	try{
+		const dbConfig = Db.pool.config.connectionConfig
+		const writeStream = fs.createWriteStream(`${filesDir}/test`)
+		const dump = spawn('mysqldump', [
+		    '-P',
+		    dbConfig.port,
+		    '-h',
+		    dbConfig.host,
+		    '-u',
+		    dbConfig.user,
+		    `-p${dbConfig.password}`,
+		    dbConfig.database,
+		])
+		console.dir(dump)
+
+		dump
+		    .stdout
+		    .pipe(writeStream)
+		    .on('finish', function () {
+		        console.log('Completed')
+		    })
+		    .on('error', function (err) {
+		        console.log(err)
+		    })
+
+		res.send('тест')
+	}catch(e){
+		res.send('Возникла ошибка')
 	}
 })

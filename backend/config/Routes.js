@@ -21,7 +21,10 @@ apiRouter.put('/admin/user', MainController.editUser)
 apiRouter.post('/admin/material', MainController.addMaterial)
 apiRouter.put('/admin/material', MainController.editMaterial)
 apiRouter.delete('/admin/material/:id', MainController.deleteMaterial)
+apiRouter.put('/admin/settings', MainController.editSettings)
 apiRouter.get('/materials', MainController.getMaterials)
+apiRouter.get('/access', MainController.checkAccess)
+apiRouter.get('/admin/db', MainController.backupDatabase)
 
 
 router.use('/api/v1', apiRouter)
