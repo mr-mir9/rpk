@@ -10,6 +10,7 @@ const Material = require('../models/MaterialModel')
 const Setting = require('../models/SettingModel')
 const AuthBan = require('../models/AuthBanModel')
 const AuthWrongAttempt = require('../models/AuthWrongAttemptModel')
+const Rand = require('../helpers/Rand')
 const { isObj, isStr } = require('../helpers/IsType')
 const { spawn } = require('child_process')
 
@@ -478,7 +479,8 @@ exports.checkAccess = asyncHandler(async (req, res) => {
 exports.backupDatabase = asyncHandler(async (req, res) => {
 	try{
 		const dbConfig = Db.pool.config.connectionConfig
-		const writeStream = fs.createWriteStream(`${filesDir}/test`)
+		const dumpPath = `${filesDir}/DUMP-${Rand('base62', 16)}.sql`
+		const writeStream = fs.createWriteStream(dumpPath)
 		const dump = spawn('mysqldump', [
 		    '-P',
 		    dbConfig.port,
@@ -489,19 +491,16 @@ exports.backupDatabase = asyncHandler(async (req, res) => {
 		    `-p${dbConfig.password}`,
 		    dbConfig.database,
 		])
-		console.dir(dump)
 
 		dump
 		    .stdout
 		    .pipe(writeStream)
 		    .on('finish', function () {
-		        console.log('Completed')
+		        res.download(dumpPath)
 		    })
 		    .on('error', function (err) {
-		        console.log(err)
+		        res.send('Возникла ошибка')
 		    })
-
-		res.send('тест')
 	}catch(e){
 		res.send('Возникла ошибка')
 	}
