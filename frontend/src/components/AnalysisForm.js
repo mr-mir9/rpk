@@ -63,7 +63,7 @@ function AnalysisForm({ resultData }){
 					x:{
 						title:{
 							display:true,
-							text:'Скорость крышки канала, м'
+							text:'Скорость крышки канала, м/с'
 						}
 					},
 					y:{
@@ -120,7 +120,7 @@ function AnalysisForm({ resultData }){
 					x:{
 						title:{
 							display:true,
-							text:'Скорость крышки канала, м'
+							text:'Скорость крышки канала, м/с'
 						}
 					},
 					y:{
@@ -177,7 +177,7 @@ function AnalysisForm({ resultData }){
 					x:{
 						title:{
 							display:true,
-							text:'Скорость крышки канала, м'
+							text:'Скорость крышки канала, м/с'
 						}
 					},
 					y:{

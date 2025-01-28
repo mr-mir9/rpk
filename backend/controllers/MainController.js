@@ -22,7 +22,7 @@ exports.calculate = asyncHandler(async (req, res) => {
 		const start = performance.now()
 		if(!isObj(req)) throw new Error('Invalid request object')
 		if(!isObj(req.body)) throw new Error('Invalid request body object')
-		let { p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu } = req.body
+		let { p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu, fromVu, toVu, dVu } = req.body
 
 		const errors = []
 
@@ -140,6 +140,34 @@ exports.calculate = asyncHandler(async (req, res) => {
 			else if(au <= 0) errors.push('Коэффициент теплоотдачи не может быть отрицательным или нулевым')
 		}
 
+		if(!isStr(fromVu) || !fromVu.length) errors.push('Введите начальную скорость крышки')
+		else if(!Validators.num(fromVu)) errors.push('Начальная скорость крышки указана неверно')
+		else{
+			fromVu = parseFloat(fromVu.replace(/,/, '.'))
+			if(!isFinite(fromVu)) errors.push('Начальная скорость крышки указана неверно')
+			else if(fromVu <= 0) errors.push('Начальная скорость крышки не может быть отрицательной или нулевой')
+		}
+
+		if(!isStr(toVu) || !toVu.length) errors.push('Введите конечную скорость крышки')
+		else if(!Validators.num(toVu)) errors.push('Конечная скорость крышки указана неверно')
+		else{
+			toVu = parseFloat(toVu.replace(/,/, '.'))
+			if(!isFinite(toVu)) errors.push('Конечная скорость крышки указана неверно')
+			else if(toVu <= 0) errors.push('Конечная скорость крышки не может быть отрицательной или нулевой')
+			else{
+
+				if(!isStr(dVu) || !dVu.length) errors.push('Введите шаг скорости крышки')
+				else if(!Validators.num(dVu)) errors.push('Шаг скорости крышки указан неверно')
+				else{
+					dVu = parseFloat(dVu.replace(/,/, '.'))
+					if(!isFinite(dVu)) errors.push('Шаг скорости крышки указан неверно')
+					else if(dVu <= 0) errors.push('Шаг скорости крышки не может быть отрицательным или нулевым')
+					else if(dVu > toVu) errors.push('Шаг скорости крышки не может быть больше конечной скорости крышки')
+				}
+
+			}
+		}
+
 		if(errors.length) throw new InvalidDataException(errors.join('. '))
 
 
@@ -171,12 +199,8 @@ exports.calculate = asyncHandler(async (req, res) => {
 
 
 		const analysis = []
-		const fromVu = 1
-		const toVu = 8
-		const deltaVu = 0.5
-
-		for(let i = parseInt(fromVu*10); i <= parseInt(toVu*10); i+=parseInt(deltaVu*10)){
-			const nowVu = i/10
+		for(let i = parseInt(fromVu*1000); i <= parseInt(toVu*1000); i+=parseInt(dVu*1000)){
+			const nowVu = i/1000
 			const vu_qch = h*w*nowVu*f/2
 			const vu_q = p*vu_qch*3600
 

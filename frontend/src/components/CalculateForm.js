@@ -84,8 +84,12 @@ function CalculateForm({ materials, setResult }){
 	const [vu, setVu] = useState('1,7')
 	const [tu, setTu] = useState('195')
 
+	const [fromVu, setFromVu] = useState('1')
+	const [toVu, setToVu] = useState('8')
+	const [dVu, setDVu] = useState('0,5')
 
-	useEffect(() => { setError(null) }, [l, w, h, vu, tu, material, p, c, t0, m0, b, tr, n, au])
+
+	useEffect(() => { setError(null) }, [l, w, h, vu, tu, material, p, c, t0, m0, b, tr, n, au, fromVu, toVu, dVu])
 
 
 	const submitHandler = useCallback(e => {
@@ -93,7 +97,7 @@ function CalculateForm({ materials, setResult }){
 
 		setLoading(true)
 
-		const requestBody = { p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu }
+		const requestBody = { p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu, fromVu, toVu, dVu }
 		api.calculate(requestBody)
 		.then(result => {
 			const item = materials.find(el => el.id === material)
@@ -103,7 +107,7 @@ function CalculateForm({ materials, setResult }){
 		})
 		.catch(e => parseNetworkError(e, null, setError))
 		.finally(() => setLoading(false))
-	}, [setResult, api, p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu, materials, material])
+	}, [setResult, api, p, c, t0, m0, b, tr, n, au, z, l, w, h, vu, tu, fromVu, toVu, dVu, materials, material])
 
 	const disabled = useMemo(() => {
 		if(loading) return true
@@ -128,7 +132,7 @@ function CalculateForm({ materials, setResult }){
 				</div>
 				<div className='input-page__container'>
 					<div className='input-page__group'>
-						<div className='m16 color-blue'>Параметры свойств объекта</div>
+						<div className='m16 color-blue'>Параметры свойств модели</div>
 						<div className='input-page__group-content'>
 							<div className='input-page__field'><Field label='Плотность' value={p} disabled={true} /><div className='t16'>кг/м<sup>3</sup></div></div>
 							<div className='input-page__field'><Field label='Удельная теплоемкость' value={c} disabled={true} /><div className='t16'>Дж/(кг⋅°C)</div></div>
@@ -175,7 +179,17 @@ function CalculateForm({ materials, setResult }){
 					<div className='input-page__group'>
 						<div className='m16 color-blue'>Параметры метода решения</div>
 						<div className='input-page__group-content'>
-							<div className='input-page__field'><Field label='Скорость крышки' value={z} setValue={setZ} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
+							<div className='input-page__field'><Field label='Шаг по длине канала' value={z} setValue={setZ} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м</div></div>
+						</div>
+					</div>
+				</div>
+				<div className='input-page__container'>
+					<div className='input-page__group'>
+						<div className='m16 color-blue'>Параметры вычислительного эксперимента</div>
+						<div className='input-page__group-content'>
+							<div className='input-page__field'><Field label='Начальная скорость крышки' value={fromVu} setValue={setFromVu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м/с</div></div>
+							<div className='input-page__field'><Field label='Конечная скорость крышки' value={toVu} setValue={setToVu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м/с</div></div>
+							<div className='input-page__field'><Field label='Шаг скорости крышки' value={dVu} setValue={setDVu} disabled={loading} pattern={/^-?(([0-9]{0,9})(,[0-9]{0,3})?)?$/} /><div className='t16'>м/с</div></div>
 						</div>
 					</div>
 				</div>
