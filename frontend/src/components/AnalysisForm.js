@@ -32,7 +32,7 @@ function AnalysisForm({ resultData }){
 		}
 
 		const ctx = document.getElementById('an_q_graph')
-		ctx.height = 250
+		ctx.height = 300
 		initedRef.current.q = new Chart(ctx, {
 			type:'line',
 			data:{
