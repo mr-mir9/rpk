@@ -32,6 +32,7 @@ function AnalysisForm({ resultData }){
 		}
 
 		const ctx = document.getElementById('an_q_graph')
+		ctx.height = 300
 		initedRef.current.q = new Chart(ctx, {
 			type:'line',
 			data:{
@@ -74,6 +75,7 @@ function AnalysisForm({ resultData }){
 				}
 			}
 		})
+		initedRef.current.q.resize()
 	}, [initedRef, resultData])
 
 	useEffect(() => {
@@ -146,7 +148,6 @@ function AnalysisForm({ resultData }){
 		}
 
 		const ctx = document.getElementById('an_nu_graph')
-		ctx.height = 300
 		initedRef.current.nu = new Chart(ctx, {
 			type:'line',
 			data:{
